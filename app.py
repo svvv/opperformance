@@ -9,10 +9,16 @@ DATA_FILE = "data.csv"
 st.set_page_config(page_title="Mobile Ops Tracker", layout="wide")
 
 # --- DATA LOADING ---
-if os.path.exists(DATA_FILE):
-    df = pd.read_csv(DATA_FILE)
-    df['Date'] = pd.to_datetime(df['Date']).dt.date
+# --- IMPROVED DATA LOADING ---
+if os.path.exists(DATA_FILE) and os.path.getsize(DATA_FILE) > 0:
+    try:
+        df = pd.read_csv(DATA_FILE)
+        df['Date'] = pd.to_datetime(df['Date']).dt.date
+    except Exception as e:
+        st.error(f"Error loading data: {e}")
+        df = pd.DataFrame() # Fallback to empty
 else:
+    # This creates the structure if the file is missing or empty
     df = pd.DataFrame(columns=[
         "Date", "Total Call Registered", "Total Call Closed", 
         "Total IW Calls Closed", "Total OW Calls Closed", 
